@@ -1,7 +1,11 @@
 const solidify = require("solidify");
-const path = require("path");
-
+const { join } = require("path");
+const sr = join(__dirname, "./server.ts");
+console.log(sr);
 (async () => {
-  await solidify.build({ srcDir: path.join(__dirname, "./src/") });
+  await solidify.build({
+    srcDir: join(__dirname, "./src/"),
+    serverEntry: join(__dirname, "./server.tsx"),
+  });
   console.log(`Done`);
 })();
