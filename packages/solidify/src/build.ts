@@ -19,7 +19,11 @@ export async function build(options: IBuildOptions) {
   });
 
   // await buildServer(options);
-  await Promise.all([buildClient(options), buildServer(options)]);
+  try {
+    await Promise.all([buildClient(options), buildServer(options)]);
+  } catch (err: any) {
+    console.log(err.message);
+  }
 }
 
 const VIRTUAL_NAME = "virtual-entrypoint.tsx";
@@ -32,6 +36,8 @@ import { lazy, Component, Suspense } from "solid-js";
 import { HydrationScript } from "solid-js/web";
 import { hydrate } from "solid-js/web";
 import { Router, RouteDefinition, useRoutes } from "solid-app-router";
+import { Document } from "solidify-utils";
+
 const routes = [
   ${pages
     .map(
@@ -44,40 +50,6 @@ const routes = [
     )
     .join(",")}
 ];
-
-export const Document: Component<{
-  url?: string;
-  routes: RouteDefinition[];
-}> = (p) => {
-  const Routes = useRoutes(p.routes);
-
-  return (
-    <html lang="en">
-      <head>
-        <meta charset="UTF-8" />
-        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <HydrationScript />
-        <title>Document</title>
-      </head>
-      <body>
-        <div id="root">
-          <Router url={p.url}>
-            <Suspense>
-              <Routes />
-            </Suspense>
-          </Router>
-        </div>
-      </body>
-      <script
-        type="module"
-        src="/static/chunks/virtual-entrypoint.js"
-        async
-      ></script>
-    </html>
-  );
-};
-
 
 hydrate(()=> <Document routes={routes} />, document);
     `;
@@ -120,7 +92,7 @@ hydrate(()=> <Document routes={routes} />, document);
         },
       }),
       nodeResolve({
-        exportConditions: ["solid"],
+        exportConditions: ["solid", "dom"],
         extensions: [".js", ".jsx", ".ts", ".tsx", ".mjs"],
       }),
       babel({
@@ -128,6 +100,7 @@ hydrate(()=> <Document routes={routes} />, document);
         extensions: [".js", ".jsx", ".ts", ".tsx"],
         presets: [["solid", { generate: "dom", hydratable: true }]],
       }),
+      common(),
       copy({
         targets: [
           {
@@ -163,7 +136,8 @@ async function buildServer(options: IBuildOptions) {
         },
       }),
       nodeResolve({
-        exportConditions: ["solid", "node"],
+        exportConditions: ["solid", "ssr"],
+        browser: false,
         extensions: [".js", ".jsx", ".ts", ".tsx"],
       }),
       babel({
