@@ -1,14 +1,9 @@
 import { Component, Suspense } from "solid-js";
 import { HydrationScript } from "solid-js/web";
 import { Router, RouteDefinition, useRoutes } from "solid-app-router";
-import { Scripts } from "./Scripts";
+import { Scripts } from "solidify-utils";
 
-export const Document: Component<{
-  url?: string;
-  routes: RouteDefinition[];
-}> = (p) => {
-  const Routes = useRoutes(p.routes);
-
+const Document: Component = (p) => {
   return (
     <html lang="en">
       <head>
@@ -19,15 +14,10 @@ export const Document: Component<{
         <title>Document</title>
       </head>
       <body>
-        <div id="root">
-          <Router url={p.url}>
-            <Suspense>
-              <h1>nice</h1>
-              <Routes />
-            </Suspense>
-          </Router>
-        </div>
+        <div id="root">{p.children}</div>
       </body>
     </html>
   );
 };
+
+export default Document;

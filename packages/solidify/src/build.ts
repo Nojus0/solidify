@@ -1,5 +1,5 @@
 import path from "path";
-import { rollup } from "rollup";
+import { LoadHook, rollup } from "rollup";
 import fs from "fs";
 import nodeResolve from "@rollup/plugin-node-resolve";
 import common from "@rollup/plugin-commonjs";
@@ -40,11 +40,11 @@ import { Document } from "solidify-utils";
 const routes = [
   ${pages
     .map(
-      (pageName, index) => `{
-      path: "${
-        pageName.toLowerCase() === "index" ? "/" : `/${pageName.toLowerCase()}`
-      }",
-      component: lazy(() => import("./src/pages/${pageName}"))
+      (page) => `{
+      path: "${page.path}",
+      component: lazy(() => import(${JSON.stringify(
+        page.component.split(".")[0]
+      )}))
     }`
     )
     .join(",")}
@@ -99,7 +99,6 @@ hydrate(()=> <Document routes={routes} />, document);
         extensions: [".js", ".jsx", ".ts", ".tsx"],
         presets: [["solid", { generate: "dom", hydratable: true }]],
       }),
-      common(),
       copy({
         targets: [
           {
@@ -133,19 +132,11 @@ async function buildServer(options: IBuildOptions) {
         name: "inject-routes",
         async resolveId(source, importer, options) {
           if (options.isEntry) {
-            // We need to skip this plugin to avoid an infinite loop
             const resolution = await this.resolve(source, importer, {
               skipSelf: true,
               ...options,
             });
-            // If it cannot be resolved or is external, just return it so that
-            // Rollup can display an error
             if (!resolution || resolution.external) return resolution;
-            // In the load hook of the proxy, we want to use this.load to find out
-            // if the entry has a default export. In the load hook, however, we no
-            // longer have the full "resolution" object that may contain meta-data
-            // from other plugins that is only added on first load. Therefore we
-            // trigger loading here without waiting for it.
             this.load(resolution);
             return `${resolution.id}?entry-proxy`;
           }
@@ -157,27 +148,27 @@ async function buildServer(options: IBuildOptions) {
             // We need to load and parse the original entry first because we need
             // to know if it has a default export
             const { code } = await this.load({ id: entryId });
-            console.log(code);
-            return {
+
+            const Hook: ReturnType<LoadHook> = {
               code:
                 `
               import { lazy } from "solid-js";
               var routes = [
                 ${pages
                   .map(
-                    (pageName, index) => `{
-                    path: "${
-                      pageName.toLowerCase() === "index"
-                        ? "/"
-                        : `/${pageName.toLowerCase()}`
-                    }",
-                    component: lazy(()=>import("./src/pages/${pageName}"))
+                    (page) => `{
+                    path: "${page.path}",
+                    component: lazy(()=> import(${JSON.stringify(
+                      page.component
+                    )}))
                   }`
                   )
                   .join(",")}
               ];
               ` + code,
             };
+            console.log(Hook.code);
+            return Hook;
           }
           return null;
         },
@@ -211,11 +202,27 @@ async function buildServer(options: IBuildOptions) {
   });
 }
 
-async function getPages(pagesDir: string, withExtension = false) {
-  const routes = new Set<string>([]);
+interface IPage {
+  path: string;
+  component: string;
+}
+
+async function getPages(pagesDir: string) {
+  const routes = new Set<IPage>([]);
 
   for (let file of fs.readdirSync(pagesDir)) {
-    routes.add(path.basename(file, withExtension ? "" : path.extname(file)));
+    let Path = path.basename(file, path.extname(file)).toLocaleLowerCase();
+
+    if (Path === "index") {
+      Path = "/";
+    } else {
+      Path = `/${Path}`;
+    }
+
+    routes.add({
+      path: Path,
+      component: path.join(pagesDir, file),
+    });
   }
 
   return Array.from(routes);
