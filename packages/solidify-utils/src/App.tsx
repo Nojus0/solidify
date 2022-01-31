@@ -1,11 +1,13 @@
-import { RouteDefinition, Router, useRoutes } from "solid-app-router";
-import { Component, Suspense } from "solid-js";
-import { MetaProvider } from "solid-meta";
+import { RouteDefinition } from "solid-app-router";
+import { Component } from "solid-js";
+import { MetaProvider, TagDescription } from "./meta/index";
+
 export interface IApp {
-  routes: RouteDefinition[];
-  url?: string;
+  tags?: TagDescription[];
 }
 
-export const App: Component = (p) => {
-  return <MetaProvider>{p.children}</MetaProvider>;
+export type SolidifyApp = Component<IApp>;
+
+export const App: SolidifyApp = (p) => {
+  return <MetaProvider tags={p.tags}>{p.children}</MetaProvider>;
 };

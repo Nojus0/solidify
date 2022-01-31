@@ -65,12 +65,14 @@ const routes = [
     .join(",")}
 ];
 
+
+
 hydrate(()=> (
-  <Document>
-    <App>
-      <Outlet routes={routes} />
-    </App>
-  </Document>
+  <Document App={() => (
+  <App>
+    <Outlet routes={routes} />
+  </App>)
+  }/>
 ), document);
     `;
   console.log(code);

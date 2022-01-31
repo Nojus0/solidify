@@ -2,11 +2,17 @@ import express from "express";
 import { RouteDefinition } from "solid-app-router";
 import { renderToStringAsync } from "solid-js/web";
 import { Component } from "solid-js";
-import { Outlet } from "solidify-utils";
+import { Outlet, SolidifyApp, SolidifyDocument } from "solidify-utils";
+
+export interface TagDescription {
+  tag: string;
+  props: Record<string, unknown>;
+}
+
 const app = express();
 
-declare var App: Component;
-declare var Document: Component;
+declare var App: SolidifyApp;
+declare var Document: SolidifyDocument;
 declare var routes: RouteDefinition[];
 
 app.use(
@@ -18,13 +24,14 @@ app.get("/*", async (req, res) => {
   console.log(`${req.method} ${req.url}`);
 
   const str = await renderToStringAsync(() => (
-    <Document>
-      <App>
-        <Outlet routes={routes} url={req.url} />
-      </App>
-    </Document>
+    <Document
+      App={(props) => (
+        <App tags={props.tags}>
+          <Outlet routes={routes} url={req.url} />
+        </App>
+      )}
+    />
   ));
-
   res.setHeader("Content-Type", "text/html");
 
   res.send(str);

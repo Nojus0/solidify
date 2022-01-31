@@ -1,8 +1,17 @@
-import { Accessor, Component, createMemo, JSX } from "solid-js";
+import { Component } from "solid-js";
+import { TagDescription } from "./meta/index";
+import { SolidifyApp } from "./App";
 import { Scripts } from "./Scripts";
-import { App, IApp } from "./App";
 
-export const Document: Component = (props) => {
+export type SolidifyDocument = Component<{
+  App: SolidifyApp;
+}>;
+
+export const Document: SolidifyDocument = (props) => {
+  let tags: TagDescription[] = [];
+
+  const App = <props.App tags={tags} />;
+  console.log(tags)
   return (
     <html lang="en">
       <head>
@@ -13,7 +22,7 @@ export const Document: Component = (props) => {
         <Scripts />
       </head>
       <body>
-        <div id="root">{props.children}</div>
+        <div id="root">{App}</div>
       </body>
     </html>
   );
