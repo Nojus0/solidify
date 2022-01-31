@@ -39,6 +39,7 @@ import { lazy, Component, Suspense } from "solid-js";
 import { HydrationScript } from "solid-js/web";
 import { hydrate } from "solid-js/web";
 import { Router, RouteDefinition, useRoutes } from "solid-app-router";
+import { Outlet } from "solidify-utils";
 ${
   options.manifest.customDocument
     ? `import Document from ${JSON.stringify(options.manifest.customDocument)}`
@@ -64,16 +65,10 @@ const routes = [
     .join(",")}
 ];
 
-const Routes = useRoutes(routes);
-
 hydrate(()=> (
   <Document>
     <App>
-      <Router>
-        <Suspense>
-          <Routes />
-        </Suspense>
-      </Router>
+      <Outlet routes={routes} />
     </App>
   </Document>
 ), document);
@@ -88,7 +83,36 @@ hydrate(()=> (
 }
 
 async function buildServer(options: InternalBuildOptions) {
-  const bundle = await rollup(getServerBuildConfig(options));
+  const code = `
+  import { lazy } from "solid-js";
+  ${
+    options.manifest.customDocument
+      ? `import Document from ${JSON.stringify(
+          options.manifest.customDocument
+        )}`
+      : `import { Document } from "solidify-utils";`
+  }
+
+  ${
+    options.manifest.customApp
+      ? `import App from ${JSON.stringify(options.manifest.customApp)}`
+      : `import { App } from "solidify-utils";`
+  }
+  
+  var routes = [
+    ${options.manifest.pages
+      .map(
+        (page) => `{
+        path: "${page.path}",
+        component: lazy(()=> import(${JSON.stringify(page.component)}))
+      }`
+      )
+      .join(",")}
+  ];
+
+  `;
+
+  const bundle = await rollup(getServerBuildConfig(code, options));
 
   await bundle.write({
     format: "cjs",

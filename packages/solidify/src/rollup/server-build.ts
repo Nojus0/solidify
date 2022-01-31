@@ -6,7 +6,10 @@ import babel from "@rollup/plugin-babel";
 import { SERVER_DIR } from "../constants";
 import { InternalBuildOptions } from "../build";
 
-export const getServerBuildConfig = (options: InternalBuildOptions) =>
+export const getServerBuildConfig = (
+  InjectCodeEntryPoint: string,
+  options: InternalBuildOptions
+) =>
   ({
     input: options.serverEntry,
     external: ["solid-js", "solid-js/web", "path", "express", "solidify"],
@@ -38,39 +41,7 @@ export const getServerBuildConfig = (options: InternalBuildOptions) =>
             const { code } = await this.load({ id: entryId });
 
             const Hook: ReturnType<LoadHook> = {
-              code:
-                `
-              import { lazy } from "solid-js";
-              ${
-                options.manifest.customDocument
-                  ? `import Document from ${JSON.stringify(
-                      options.manifest.customDocument
-                    )}`
-                  : `import { Document } from "solidify-utils";`
-              }
-
-              ${
-                options.manifest.customApp
-                  ? `import App from ${JSON.stringify(
-                      options.manifest.customApp
-                    )}`
-                  : `import { App } from "solidify-utils";`
-              }
-
-              var routes = [
-                ${options.manifest.pages
-                  .map(
-                    (page) => `{
-                    path: "${page.path}",
-                    component: lazy(()=> import(${JSON.stringify(
-                      page.component
-                    )}))
-                  }`
-                  )
-                  .join(",")}
-              ];
-
-              ` + code,
+              code: InjectCodeEntryPoint + code,
             };
             console.log(Hook.code);
             return Hook;

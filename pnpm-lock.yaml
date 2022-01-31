@@ -83,6 +83,7 @@ importers:
       rollup-plugin-typescript2: ^0.31.1
       solid-app-router: ^0.2.1
       solid-js: ^1.3.4
+      solid-meta: ^0.27.3
       ts-toolbelt: ^9.6.0
       tslib: ^2.3.1
       typescript: ^4.5.5
@@ -102,6 +103,7 @@ importers:
       rollup: 2.66.1
       rollup-plugin-copy: 3.4.0
       rollup-plugin-typescript2: 0.31.1_6cf6dc7e0f2a059bfbcf3818539e4e56
+      solid-meta: 0.27.3_solid-js@1.3.4
       ts-toolbelt: 9.6.0
       tslib: 2.3.1
       typescript: 4.5.5
@@ -1551,6 +1553,14 @@ packages:
   /solid-js/1.3.4:
     resolution: {integrity: sha512-iMdb6wUPl+n9vkNLREyiyperl+L5n+KDe4T+XGwpU6vztwuga5ciNZr0qCQzbGDiQgDAziKyqk2/B+Qu3kMQWA==}
     dev: false
+
+  /solid-meta/0.27.3_solid-js@1.3.4:
+    resolution: {integrity: sha512-XaVv0EPkoPvufzUOIMn4yOzZFnJvQPVBlpZFLc9zTFTUnb+cq/zuoWr0Sa0fEntodfVPe5j6NfvXwGE6pHQo+w==}
+    peerDependencies:
+      solid-js: ^1.0.0
+    dependencies:
+      solid-js: 1.3.4
+    dev: true
 
   /source-map/0.5.7:
     resolution: {integrity: sha1-igOdLRAh0i0eoUyA2OpGi6LvP8w=}
