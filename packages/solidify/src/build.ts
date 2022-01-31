@@ -9,10 +9,15 @@ import { BUILD_DIR, CHUNKS_DIR, SERVER_DIR } from "./constants";
 import copy from "rollup-plugin-copy";
 import { getClientBuildConfig } from "./rollup/client-build";
 import { getServerBuildConfig } from "./rollup/server-build";
+import { getPageManifest, IPageManifest } from "./manifest";
 
 export interface IBuildOptions {
   srcDir: string;
   serverEntry: string;
+}
+
+export interface InternalBuildOptions extends IBuildOptions {
+  manifest: IPageManifest;
 }
 
 export async function build(options: IBuildOptions) {
@@ -21,13 +26,19 @@ export async function build(options: IBuildOptions) {
   });
 
   try {
-    await Promise.all([buildClient(options), buildServer(options)]);
+    const manifest: InternalBuildOptions = {
+      srcDir: options.srcDir,
+      serverEntry: options.serverEntry,
+      manifest: await getPageManifest(path.join(options.srcDir, "pages")),
+    };
+
+    await Promise.all([buildClient(manifest), buildServer(manifest)]);
   } catch (err: any) {
     console.log(err.message);
   }
 }
 
-async function buildClient(options: IBuildOptions) {
+async function buildClient(options: InternalBuildOptions) {
   const pagesDir = path.join(options.srcDir, "pages");
   const manifest = await getPageManifest(pagesDir);
 
@@ -62,45 +73,11 @@ hydrate(()=> <Document routes={routes} />, document);
   });
 }
 
-async function buildServer(options: IBuildOptions) {
-  const pagesDir = path.join(options.srcDir, "pages");
-  const manifest = await getPageManifest(pagesDir);
-  const bundle = await rollup(getServerBuildConfig(manifest, options));
+async function buildServer(options: InternalBuildOptions) {
+  const bundle = await rollup(getServerBuildConfig(options));
 
   await bundle.write({
     format: "cjs",
     dir: path.resolve(process.cwd(), SERVER_DIR),
   });
-}
-
-interface IPage {
-  path: string;
-  component: string;
-}
-
-export interface IPageManifest {
-  pages: IPage[];
-}
-
-async function getPageManifest(pagesDir: string): Promise<IPageManifest> {
-  const routes = new Set<IPage>([]);
-
-  for (let file of fs.readdirSync(pagesDir)) {
-    let Path = path.basename(file, path.extname(file)).toLocaleLowerCase();
-
-    if (Path === "index") {
-      Path = "/";
-    } else {
-      Path = `/${Path}`;
-    }
-
-    routes.add({
-      path: Path,
-      component: path.join(pagesDir, file),
-    });
-  }
-
-  return {
-    pages: Array.from(routes)
-  } 
 }

@@ -1,18 +1,12 @@
 import path from "path";
 import { LoadHook, rollup, RollupOptions, watch } from "rollup";
-import fs from "fs";
 import nodeResolve from "@rollup/plugin-node-resolve";
 import common from "@rollup/plugin-commonjs";
 import babel from "@rollup/plugin-babel";
-import typescript from "rollup-plugin-typescript2";
-import { BUILD_DIR, CHUNKS_DIR, SERVER_DIR, VIRTUAL_NAME } from "../constants";
-import copy from "rollup-plugin-copy";
-import { IBuildOptions, IPageManifest } from "../build";
+import { SERVER_DIR } from "../constants";
+import { InternalBuildOptions } from "../build";
 
-export const getServerBuildConfig = (
-  manifest: IPageManifest,
-  options: IBuildOptions
-) =>
+export const getServerBuildConfig = (options: InternalBuildOptions) =>
   ({
     input: options.serverEntry,
     external: ["solid-js", "solid-js/web", "path", "express", "solidify"],
@@ -48,7 +42,7 @@ export const getServerBuildConfig = (
                 `
               import { lazy } from "solid-js";
               var routes = [
-                ${manifest.pages
+                ${options.manifest.pages
                   .map(
                     (page) => `{
                     path: "${page.path}",
