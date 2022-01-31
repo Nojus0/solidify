@@ -48,6 +48,15 @@ export const getServerBuildConfig = (options: InternalBuildOptions) =>
                     )}`
                   : `import { Document } from "solidify-utils";`
               }
+
+              ${
+                options.manifest.customApp
+                  ? `import App from ${JSON.stringify(
+                      options.manifest.customApp
+                    )}`
+                  : `import { App } from "solidify-utils";`
+              }
+
               var routes = [
                 ${options.manifest.pages
                   .map(

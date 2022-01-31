@@ -9,6 +9,7 @@ export interface IPage {
 export interface IPageManifest {
   pages: IPage[];
   customDocument?: string;
+  customApp?: string;
 }
 
 export async function getPageManifest(
@@ -25,6 +26,9 @@ export async function getPageManifest(
       Path = "/";
     } else if (Path == "_document") {
       manifest.customDocument = path.join(pagesDir, file);
+      continue;
+    } else if (Path == "_app") {
+      manifest.customApp = path.join(pagesDir, file);
       continue;
     } else {
       Path = `/${Path}`;

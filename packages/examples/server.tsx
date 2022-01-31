@@ -3,10 +3,9 @@ import path from "path";
 import { RouteDefinition, Router, useRoutes } from "solid-app-router";
 import { renderToStringAsync } from "solid-js/web";
 import { Component, Suspense } from "solid-js";
-import { App } from "solidify-utils";
 const app = express();
 
-
+declare var App: Component
 declare var Document: Component;
 declare var routes: RouteDefinition[];
 

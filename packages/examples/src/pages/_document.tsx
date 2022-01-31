@@ -20,7 +20,6 @@ const Document: Component = (p) => {
         />
         <link rel="stylesheet" href="/static/global.css" />
         <Scripts />
-        <title>Document</title>
       </head>
       <body>
         <div id="root">{p.children}</div>

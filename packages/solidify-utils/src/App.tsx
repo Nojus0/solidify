@@ -7,10 +7,5 @@ export interface IApp {
 }
 
 export const App: Component = (p) => {
-  return (
-    <>
-      <h1>nice</h1>
-      {p.children}
-    </>
-  );
+  return p.children;
 };

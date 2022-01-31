@@ -44,7 +44,12 @@ ${
     ? `import Document from ${JSON.stringify(options.manifest.customDocument)}`
     : `import { Document } from "solidify-utils";`
 }
-import { App } from "solidify-utils";
+${
+  options.manifest.customApp
+    ? `import App from ${JSON.stringify(options.manifest.customApp)}`
+    : `import { App } from "solidify-utils";`
+}
+
 
 const routes = [
   ${options.manifest.pages
