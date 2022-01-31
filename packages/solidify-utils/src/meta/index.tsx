@@ -153,6 +153,16 @@ export function renderTags(tags: Array<TagDescription>) {
     .join("");
 }
 
+export const Tags: Component<{ tags: TagDescription[] }> = (p) => {
+  return (
+    <>
+      {p.tags.map((tag) => {
+        return <Dynamic {...tag.props} children={tag.props?.children} data-sm="" component={tag.tag} />;
+      })}
+    </>
+  );
+};
+
 export const Title: Component<JSX.HTMLAttributes<HTMLTitleElement>> = (props) =>
   MetaTag("title", props);
 

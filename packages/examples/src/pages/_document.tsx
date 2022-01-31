@@ -1,18 +1,12 @@
 import { Component } from "solid-js";
-import { TagDescription } from "./meta/index";
-import { SolidifyApp } from "./App";
-import { Scripts } from "./Scripts";
-
-export type SolidifyDocument = Component<{
-  App: SolidifyApp;
-}>;
+import { Scripts, SolidifyDocument, TagDescription, Tags } from "solidify-utils";
 
 export const Document: SolidifyDocument = (props) => {
   let tags: TagDescription[] = [];
 
   const App = <props.App tags={tags} />;
-  
-  console.log(tags)
+
+  console.log(tags);
   return (
     <html lang="en">
       <head>
@@ -20,6 +14,18 @@ export const Document: SolidifyDocument = (props) => {
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="icon" type="image/png" href="/static/favicon.png" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin="anonymous"
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap"
+          rel="stylesheet"
+        />
+        <link rel="stylesheet" href="/static/global.css"/>
+        <Tags tags={tags}/>
         <Scripts />
       </head>
       <body>
@@ -28,3 +34,5 @@ export const Document: SolidifyDocument = (props) => {
     </html>
   );
 };
+
+export default Document;
