@@ -1,8 +1,7 @@
 import express from "express";
-import path from "path";
-import { RouteDefinition, Router, useRoutes } from "solid-app-router";
+import { RouteDefinition } from "solid-app-router";
 import { renderToStringAsync } from "solid-js/web";
-import { Component, Suspense } from "solid-js";
+import { Component } from "solid-js";
 import { Outlet } from "solidify-utils";
 const app = express();
 
@@ -10,7 +9,10 @@ declare var App: Component;
 declare var Document: Component;
 declare var routes: RouteDefinition[];
 
-app.use("/static", express.static(path.resolve(__dirname, "../static/")));
+app.use(
+  "/static",
+  express.static("./.solidify/static/", { fallthrough: false })
+);
 
 app.get("/*", async (req, res) => {
   console.log(`${req.method} ${req.url}`);

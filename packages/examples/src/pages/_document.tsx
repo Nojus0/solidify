@@ -18,6 +18,7 @@ const Document: Component = (p) => {
           href={`https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap`}
           rel="stylesheet"
         />
+        <link rel="icon" type="image/png" href="/static/favicon.png" />
         <link rel="stylesheet" href="/static/global.css" />
         <Scripts />
       </head>
