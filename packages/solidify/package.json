@@ -5,7 +5,7 @@
   "types": "./dist/index.d.ts",
   "main": "./dist/index.js",
   "scripts": {
-    "build": "tsc && rollup -c ./rollup.config.js"
+    "dev": "tsc -w"
   },
   "license": "AGPL-3.0",
   "dependencies": {

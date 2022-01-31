@@ -1,14 +1,9 @@
-import { Component, Suspense } from "solid-js";
-import { HydrationScript } from "solid-js/web";
-import { Router, RouteDefinition, useRoutes } from "solid-app-router";
+import { Component } from "solid-js";
+import { useRoutes } from "solid-app-router";
 import { Scripts } from "./Scripts";
+import { App, IApp } from "./App";
 
-export const Document: Component<{
-  url?: string;
-  routes: RouteDefinition[];
-}> = (p) => {
-  const Routes = useRoutes(p.routes);
-
+export const Document: Component<IApp> = (p) => {
   return (
     <html lang="en">
       <head>
@@ -20,12 +15,7 @@ export const Document: Component<{
       </head>
       <body>
         <div id="root">
-          <Router url={p.url}>
-            <Suspense>
-              <h1>nice</h1>
-              <Routes />
-            </Suspense>
-          </Router>
+          <App {...p} />
         </div>
       </body>
     </html>
