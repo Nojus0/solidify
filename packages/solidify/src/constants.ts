@@ -3,3 +3,5 @@ export const STATIC_DIR = ".solidify/static";
 export const CHUNKS_DIR = ".solidify/static/chunks";
 
 export const SERVER_DIR = ".solidify/server";
+
+export const VIRTUAL_NAME = "virtual-entrypoint.tsx";
