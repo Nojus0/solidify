@@ -6,15 +6,11 @@ export interface IApp {
   url?: string;
 }
 
-export const App: Component<IApp> = (p) => {
-  const Routes = useRoutes(p.routes);
-
+export const App: Component = (p) => {
   return (
-    <Router url={p.url}>
-      <Suspense>
-        <h1>nice</h1>
-        <Routes />
-      </Suspense>
-    </Router>
+    <>
+      <h1>nice</h1>
+      {p.children}
+    </>
   );
 };

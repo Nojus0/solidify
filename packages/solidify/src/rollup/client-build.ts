@@ -1,13 +1,17 @@
 import path from "path";
-import { LoadHook, rollup, RollupOptions, watch } from "rollup";
+import { RollupOptions } from "rollup";
 import nodeResolve from "@rollup/plugin-node-resolve";
 import babel from "@rollup/plugin-babel";
-import { BUILD_DIR, CHUNKS_DIR, SERVER_DIR, VIRTUAL_NAME } from "../constants";
+import { BUILD_DIR, VIRTUAL_NAME } from "../constants";
 import copy from "rollup-plugin-copy";
 import { InternalBuildOptions } from "../build";
 
-export const getClientBuildConfig = (code: string, options: InternalBuildOptions) =>
-  ({
+export const getClientBuildConfig = (
+  code: string,
+  options: InternalBuildOptions
+) => {
+
+  return {
     input: VIRTUAL_NAME,
     preserveEntrySignatures: false,
     external: ["path", "express"],
@@ -48,12 +52,17 @@ export const getClientBuildConfig = (code: string, options: InternalBuildOptions
         extensions: [".js", ".jsx", ".ts", ".tsx", ".mjs"],
       }),
       copy({
+        verbose: true,
+        absolute: true,
         targets: [
           {
-            src: path.resolve(options.srcDir, "public"),
-            dest: path.resolve(process.cwd(), BUILD_DIR),
+            absolute: true,
+            cwd: process.cwd(),
+            src: "src/static/*",
+            dest: ".solidify/static",
           },
         ],
       }),
     ],
-  } as RollupOptions);
+  } as RollupOptions;
+};

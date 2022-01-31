@@ -8,27 +8,33 @@ export interface IPage {
 
 export interface IPageManifest {
   pages: IPage[];
+  customDocument?: string;
 }
 
-export async function getPageManifest(pagesDir: string): Promise<IPageManifest> {
-  const routes = new Set<IPage>([]);
+export async function getPageManifest(
+  pagesDir: string
+): Promise<IPageManifest> {
+  const manifest: IPageManifest = {
+    pages: [],
+  };
 
   for (let file of fs.readdirSync(pagesDir)) {
     let Path = path.basename(file, path.extname(file)).toLocaleLowerCase();
 
     if (Path === "index") {
       Path = "/";
+    } else if (Path == "_document") {
+      manifest.customDocument = path.join(pagesDir, file);
+      continue;
     } else {
       Path = `/${Path}`;
     }
 
-    routes.add({
+    manifest.pages.push({
       path: Path,
       component: path.join(pagesDir, file),
     });
   }
 
-  return {
-    pages: Array.from(routes),
-  };
+  return manifest;
 }

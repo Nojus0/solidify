@@ -1,12 +1,7 @@
 import path from "path";
-import { LoadHook, rollup, watch } from "rollup";
+import { rollup } from "rollup";
 import fs from "fs";
-import nodeResolve from "@rollup/plugin-node-resolve";
-import common from "@rollup/plugin-commonjs";
-import babel from "@rollup/plugin-babel";
-import typescript from "rollup-plugin-typescript2";
 import { BUILD_DIR, CHUNKS_DIR, SERVER_DIR } from "./constants";
-import copy from "rollup-plugin-copy";
 import { getClientBuildConfig } from "./rollup/client-build";
 import { getServerBuildConfig } from "./rollup/server-build";
 import { getPageManifest, IPageManifest } from "./manifest";
@@ -39,30 +34,44 @@ export async function build(options: IBuildOptions) {
 }
 
 async function buildClient(options: InternalBuildOptions) {
-  const pagesDir = path.join(options.srcDir, "pages");
-  const manifest = await getPageManifest(pagesDir);
-
   const code = `
 import { lazy, Component, Suspense } from "solid-js";
 import { HydrationScript } from "solid-js/web";
 import { hydrate } from "solid-js/web";
 import { Router, RouteDefinition, useRoutes } from "solid-app-router";
-import { Document } from "solidify-utils";
+${
+  options.manifest.customDocument
+    ? `import Document from ${JSON.stringify(options.manifest.customDocument)}`
+    : `import { Document } from "solidify-utils";`
+}
+import { App } from "solidify-utils";
 
 const routes = [
-  ${manifest.pages
+  ${options.manifest.pages
     .map(
       (page) => `{
       path: "${page.path}",
       component: lazy(() => import(${JSON.stringify(
-        page.component.split(".")[0]
+        page.component.split(".").shift()
       )}))
     }`
     )
     .join(",")}
 ];
 
-hydrate(()=> <Document routes={routes} />, document);
+const Routes = useRoutes(routes);
+
+hydrate(()=> (
+  <Document>
+    <App>
+      <Router>
+        <Suspense>
+          <Routes />
+        </Suspense>
+      </Router>
+    </App>
+  </Document>
+), document);
     `;
   console.log(code);
 

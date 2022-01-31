@@ -1,5 +1,5 @@
 import path from "path";
-import { LoadHook, rollup, RollupOptions, watch } from "rollup";
+import { LoadHook, RollupOptions } from "rollup";
 import nodeResolve from "@rollup/plugin-node-resolve";
 import common from "@rollup/plugin-commonjs";
 import babel from "@rollup/plugin-babel";
@@ -41,6 +41,13 @@ export const getServerBuildConfig = (options: InternalBuildOptions) =>
               code:
                 `
               import { lazy } from "solid-js";
+              ${
+                options.manifest.customDocument
+                  ? `import Document from ${JSON.stringify(
+                      options.manifest.customDocument
+                    )}`
+                  : `import { Document } from "solidify-utils";`
+              }
               var routes = [
                 ${options.manifest.pages
                   .map(
@@ -53,6 +60,7 @@ export const getServerBuildConfig = (options: InternalBuildOptions) =>
                   )
                   .join(",")}
               ];
+
               ` + code,
             };
             console.log(Hook.code);

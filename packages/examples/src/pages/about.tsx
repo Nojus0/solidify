@@ -6,7 +6,7 @@ const About: Component = () => {
     <div>
       About Page
       <br />
-      <Link href="/">Goto Main 1</Link>
+      <Link href="/">Goto Main</Link>
     </div>
   );
 };

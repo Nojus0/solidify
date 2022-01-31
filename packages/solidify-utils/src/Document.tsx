@@ -1,9 +1,8 @@
-import { Component } from "solid-js";
-import { useRoutes } from "solid-app-router";
+import { Accessor, Component, createMemo, JSX } from "solid-js";
 import { Scripts } from "./Scripts";
 import { App, IApp } from "./App";
 
-export const Document: Component<IApp> = (p) => {
+export const Document: Component = (props) => {
   return (
     <html lang="en">
       <head>
@@ -14,9 +13,7 @@ export const Document: Component<IApp> = (p) => {
         <title>Document</title>
       </head>
       <body>
-        <div id="root">
-          <App {...p} />
-        </div>
+        <div id="root">{props.children}</div>
       </body>
     </html>
   );
