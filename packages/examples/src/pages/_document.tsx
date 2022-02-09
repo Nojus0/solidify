@@ -1,5 +1,11 @@
-import { Component } from "solid-js";
-import { Scripts, SolidifyDocument, TagDescription, Tags } from "solidify-utils";
+import { ssr, Assets, render } from "solid-js/web";
+import {
+  renderTags,
+  Scripts,
+  SolidifyDocument,
+  TagDescription,
+  Tags,
+} from "solidify-utils";
 
 export const Document: SolidifyDocument = (props) => {
   let tags: TagDescription[] = [];
@@ -24,8 +30,8 @@ export const Document: SolidifyDocument = (props) => {
           href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap"
           rel="stylesheet"
         />
-        <link rel="stylesheet" href="/static/global.css"/>
-        <Tags tags={tags}/>
+        <link rel="stylesheet" href="/static/global.css" />
+        <Assets>{ssr(renderTags(tags)) as any}</Assets>
         <Scripts />
       </head>
       <body>

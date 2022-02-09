@@ -16,7 +16,7 @@ export interface InternalBuildOptions extends IBuildOptions {
 }
 
 export async function build(options: IBuildOptions) {
-  fs.rmdirSync(path.join(process.cwd(), BUILD_DIR), {
+  fs.rmSync(path.join(process.cwd(), BUILD_DIR), {
     recursive: true,
   });
 
@@ -75,7 +75,6 @@ hydrate(()=> (
   }/>
 ), document);
     `;
-  console.log(code);
 
   const bundle = await rollup(getClientBuildConfig(code, options));
   await bundle.write({
@@ -86,6 +85,11 @@ hydrate(()=> (
 
 async function buildServer(options: InternalBuildOptions) {
   const code = `
+  import { Headers, Request, Response, fetch } from "cross-fetch";
+  global.fetch = fetch;
+  global.Request = Request;
+  global.Headers = Headers;
+  global.Response = Response;
   import { lazy } from "solid-js";
   ${
     options.manifest.customDocument

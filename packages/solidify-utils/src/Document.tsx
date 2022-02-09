@@ -12,7 +12,6 @@ export const Document: SolidifyDocument = (props) => {
 
   const App = <props.App tags={tags} />;
   
-  console.log(tags)
   return (
     <html lang="en">
       <head>

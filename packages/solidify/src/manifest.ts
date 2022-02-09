@@ -1,5 +1,5 @@
-import fs from "fs";
-import path from "path";
+import fs, { stat } from "fs";
+import path from "path/posix";
 
 export interface IPage {
   path: string;
@@ -19,26 +19,53 @@ export async function getPageManifest(
     pages: [],
   };
 
-  for (let file of fs.readdirSync(pagesDir)) {
-    let Path = path.basename(file, path.extname(file)).toLocaleLowerCase();
+  const dfs = (directory: string) => {
+    const files = fs.readdirSync(directory);
 
-    if (Path === "index") {
-      Path = "/";
-    } else if (Path == "_document") {
-      manifest.customDocument = path.join(pagesDir, file);
-      continue;
-    } else if (Path == "_app") {
-      manifest.customApp = path.join(pagesDir, file);
-      continue;
-    } else {
-      Path = `/${Path}`;
+    for (let file of files) {
+      const filePath = path.join(directory, file);
+      const stats = fs.statSync(filePath);
+      const isFolder = stats.isDirectory();
+
+      if (isFolder) {
+        dfs(filePath);
+      } else {
+        const { name, dir } = path.parse(filePath);
+
+        if (name == "_document") {
+          manifest.customDocument = path.join(directory, file);
+          continue;
+        } else if (name == "_app") {
+          manifest.customApp = path.join(directory, file);
+          continue;
+        }
+
+        const relative = path.relative(pagesDir, dir);
+
+        if (/^\[.*|.*\]$/gm.test(name)) {
+          let transformed = `:${name.replace(/\[|\]/gm, "")}`;
+
+          manifest.pages.push({
+            component: filePath,
+            path: relative ? `/${relative}/${transformed}` : `/${transformed}`,
+          });
+          continue;
+        }
+
+        manifest.pages.push({
+          component: filePath,
+          path:
+            name === "index"
+              ? "/"
+              : relative
+              ? `/${relative}/${name}`
+              : `/${name}`,
+        });
+      }
     }
+  };
 
-    manifest.pages.push({
-      path: Path,
-      component: path.join(pagesDir, file),
-    });
-  }
-
+  dfs(pagesDir);
+  console.log(manifest);
   return manifest;
 }

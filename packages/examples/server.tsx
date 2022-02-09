@@ -20,14 +20,28 @@ app.use(
   express.static("./.solidify/static/", { fallthrough: false })
 );
 
+(async () => {})();
+
 app.get("/*", async (req, res) => {
-  console.log(`${req.method} ${req.url}`);
+  let props: any;
+
+  for (const rt of routes) {
+    const a = await (rt.component as any).preload();
+
+    const data = await a.getServerProps();
+
+    props = data;
+  }
+
+  if (req.query.data == "true") {
+    return res.json(props);
+  }
 
   const str = await renderToStringAsync(() => (
     <Document
-      App={(props) => (
-        <App tags={props.tags}>
-          <Outlet routes={routes} url={req.url} />
+      App={(p) => (
+        <App tags={p.tags}>
+          <Outlet props={props} routes={routes} url={req.url} />
         </App>
       )}
     />

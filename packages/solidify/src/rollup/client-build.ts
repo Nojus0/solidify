@@ -10,7 +10,6 @@ export const getClientBuildConfig = (
   code: string,
   options: InternalBuildOptions
 ) => {
-
   return {
     input: VIRTUAL_NAME,
     preserveEntrySignatures: false,

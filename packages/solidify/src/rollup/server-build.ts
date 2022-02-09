@@ -5,7 +5,7 @@ import common from "@rollup/plugin-commonjs";
 import babel from "@rollup/plugin-babel";
 import { SERVER_DIR } from "../constants";
 import { InternalBuildOptions } from "../build";
-
+import json from "@rollup/plugin-json";
 export const getServerBuildConfig = (
   InjectCodeEntryPoint: string,
   options: InternalBuildOptions
@@ -19,6 +19,7 @@ export const getServerBuildConfig = (
     },
     preserveEntrySignatures: false,
     plugins: [
+      json(),
       {
         name: "inject-routes",
         async resolveId(source, importer, options) {
@@ -43,7 +44,6 @@ export const getServerBuildConfig = (
             const Hook: ReturnType<LoadHook> = {
               code: InjectCodeEntryPoint + code,
             };
-            console.log(Hook.code);
             return Hook;
           }
           return null;
@@ -58,10 +58,11 @@ export const getServerBuildConfig = (
         ],
       }),
       nodeResolve({
-        exportConditions: ["solid", "ssr"],
-        browser: false,
+        exportConditions: ["require", "module", "import", "solid", "ssr"],
         extensions: [".js", ".jsx", ".ts", ".tsx"],
       }),
-      common(),
+      common({
+        extensions: [".js", ".jsx", ".ts", ".tsx"],
+      }),
     ],
   } as RollupOptions);

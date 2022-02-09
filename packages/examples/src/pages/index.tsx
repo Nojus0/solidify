@@ -9,6 +9,10 @@ const Index: Component = () => {
       <Title>Main page</Title>
       <br />
       <Link href="/about">Goto About</Link>
+      <br />
+      <Link href="/profile/1">Go to Profile 1</Link>
+      <br />
+      <Link href="/profile/nest/1">Go to nest</Link>
     </div>
   );
 };
